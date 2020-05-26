@@ -25,9 +25,9 @@ socket.instance.router.add("/") {
 You can implement handler with class 
 ```swift
 public class SomeHandler: RouteHandler {
-	public func handle(_ handledRoute: HandledRoute) -> Void {
-	  print("Matched")
-	}
+  public func handle(_ handledRoute: HandledRoute) -> Void {
+    print("Matched")
+  }
 }
 
 socket.instance.router.add("/", SomeHandler())
@@ -36,18 +36,18 @@ socket.instance.router.add("/", SomeHandler())
 You can use regex
 ```swift
 socket.instance.router.add("[0-9]") {
-   print($0.extractedParams) // [0] = Integer
+  print($0.extractedParams) // [0] = Integer
 }
 
 socket.instance.router.add("[0-9]/[a-z]+") {
-   print($0.extractedParams) // [0] = Integer, [1] - String
+  print($0.extractedParams) // [0] = Integer, [1] - String
 }
 ```
 
 If you want named params, just add `namedParams` 
 ```swift
 socket.instance.router.add("[0-9]/[a-z]", namedParams: ["id", "name"]) {
-	print($0.associatedParams) // ["id"] - Integer, ["name"] - String
+  print($0.associatedParams) // ["id"] - Integer, ["name"] - String
 }
 ```
 ```swift
@@ -61,7 +61,7 @@ public class UserData: Decodable {
 }
 
 public class SomeObservable: ObservableObject {
-	@MieSockets.RouterWrapperWithDecodable(url: "users", decodeAs: UserData.self) public var user: User?
+  @MieSockets.RouterWrapperWithDecodable(url: "users", decodeAs: UserData.self) public var user: User?
 }
 ```
 
@@ -69,9 +69,9 @@ public class SomeObservable: ObservableObject {
 You can pass handlers on events (like connected, disconnected, etc)
 ```swift
 class ConnectedHandler: SocketConnectedHandler {
-	public func handle(headers: SocketConnectedHandler.Headers) -> Void {
-		print("Connected: \(headers)")
-	}
+  public func handle(headers: SocketConnectedHandler.Headers) -> Void {
+    print("Connected: \(headers)")
+  }
 }
 
 socket.instance.connectedHandler = ConnectedHandler()
@@ -98,28 +98,27 @@ It's calling `hydrator`
 By default it's looks so simple
 ```swift
 public class DefaultReceivedDataHydrator: ReceivedDataHydrator {
-	public func hydrate(_ data: Data) -> HydratedData? {
-		do {
-			if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-				if let event = json["event"] as? MieSockets.RouteUrl {
-					return (url: event, rawData: data)
-				}
-			}
-		} catch {
-			print("Can\'t hydrate data: \(String(decoding: data, as: UTF8.self))  \(error)")
-		}
-		
-		return nil
-	}
+  public func hydrate(_ data: Data) -> HydratedData? {
+    do {
+      if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+        if let event = json["event"] as? MieSockets.RouteUrl {
+          return (url: event, rawData: data)
+        }
+      }
+    } catch {
+      print("Can\'t hydrate data: \(String(decoding: data, as: UTF8.self))  \(error)")
+    }
+       return nil
+  }
 }
 ```
 If your server sends the route by `event` key - use default implementation. But you can implement it if you need
 
 ```swift
 public class MyHydrator: ReceivedDataHydrator {
-	public func hydrate(_ data: Data) -> HydratedData? {
-		//
-	}
+  public func hydrate(_ data: Data) -> HydratedData? {
+    //
+  }
 }
 
 socket.instance.hydrator = MyHydrator()
